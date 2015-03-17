@@ -1,5 +1,3 @@
-# Custom Web Search Engine
-
 # Summary
 
 We will design simple web search engine. Engine settings can be modified by user, thus for an 
@@ -36,6 +34,11 @@ After crawling phase, user can set a pivot website. According to query, cosine d
 will help engine to get intended results. Ranked search results are shown with or without pivot site.
 
 # Contributers
+
 * [Emre Can Kucukoglu](https://github.com/eckucukoglu/)
 * [Fatih Hafizoglu](https://github.com/fatihafizoglu)
 * [Yigit Ilguner](https://github.com/e1560762)
+
+# Website
+
+Project github page: http://eckucukoglu.github.io/custom-web-se

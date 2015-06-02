@@ -12,10 +12,11 @@ public class InitCrawler {
 		
     public static void main(String[] args) {
         String seedUrl = "http://www.metu.edu.tr";
-        int maxDepth = 5;
-        int maxPages = 100;
+        int maxDepth = 1;
+        int maxPages = 10000;
     	
     	Crawler crawler = new Crawler(seedUrl, maxDepth, maxPages);
-//    	crawler.collect();
+    	crawler.collect();
+    	crawler.createLog();
     }
 }

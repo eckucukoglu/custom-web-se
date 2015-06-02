@@ -28,6 +28,16 @@ public class Url implements Comparable<Url>, Comparator<Url>{
 	}
 	
 	/**
+	 * Copy constructor.
+	 * 
+	 * @param url
+	 */
+	Url (Url url) {
+		this.url = url.url;
+		this.depth = url.depth;
+	}
+	
+	/**
 	 * 
 	 * @return depth of a Url.
 	 */

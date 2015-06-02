@@ -19,6 +19,7 @@ import java.util.Set;
  *
  */
 public class Crawler {
+	// TODO: print debug info
 	
 	public static final String DATADIR = "data/collections";
 	public static final String LOGFILE = "crawl.log";
@@ -35,33 +36,30 @@ public class Crawler {
     	this.initialUrl = new Url(url, 0);
     	this.maxDepth = depth;
     	this.maxPages = pages;
+    	createDirectory();
     }
     
     public void collect() {
         while (this.pagesVisited.size() < this.maxPages) {
-            String currentUrl;
-            Spider leg = new Spider();
+            Url currentUrl;
+            Spider spider = new Spider();
             
             if (this.pagesToVisit.isEmpty()) {
-                currentUrl = url;
-                this.pagesVisited.add(url);
+                currentUrl = this.initialUrl;
+                this.pagesVisited.add(currentUrl);
             } else {
                 currentUrl = this.nextUrl();
             }
             
-            leg.crawl(currentUrl);
+            // Maximum depth control
+            if (currentUrl.getDepth() > this.maxDepth)
+            	return;
+            
+            spider.crawl(currentUrl);
+            this.pagesVisited.add(currentUrl);
 
-            boolean success = leg.searchForWord(searchWord);
-            
-            if (success) {
-                System.out.println(String.format("**Success** Word %s found at %s", searchWord, currentUrl));
-                break;
-            }
-            
-            this.pagesToVisit.addAll(leg.getLinks());
+            this.pagesToVisit.addAll(spider.getLinks());
         }
-        
-        System.out.println(String.format("**Done** Visited %s web page(s)", this.pagesVisited.size()));
     }
     
     private boolean createDirectory() {
@@ -84,7 +82,7 @@ public class Crawler {
     	}
     } 
     
-    private boolean createLog() {
+    public boolean createLog() {
     	Path path = Paths.get(System.getProperty("user.dir"), DATADIR, Integer.toString(collectionId));
     	String pathStr = path.toString();
 		File dir = new File(pathStr);
@@ -100,6 +98,7 @@ public class Crawler {
 		    	writer.println("Seed Url:\t" + this.initialUrl.getUrl());
 		    	writer.println("Max depth:\t" + this.maxDepth);
 		    	writer.println("Max pages:\t" + this.maxPages);
+		    	writer.println("Seeded pages:\t" + this.pagesVisited.size());
 		    	writer.close();
 		    	
 		    	if (InitCrawler.DEBUGMODE) System.out.println("Created log: " + path.toString());
@@ -130,8 +129,6 @@ public class Crawler {
         } while(this.pagesVisited.contains(nextUrl));
         
         // TODO: check that Url.equals works correctly. 
-        
-        this.pagesVisited.add(nextUrl);
         
         return nextUrl;
     }

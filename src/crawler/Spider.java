@@ -79,10 +79,13 @@ public class Spider {
 	 */
 	public void saveHtml(String saveLocation) {
 		try {
-			FileWriter fileWriter = new FileWriter(saveLocation);
-			BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
-			bufferedWriter.write(this.htmlDocument.body().html());
-			bufferedWriter.close();
+			if (this.htmlDocument != null) { 
+				FileWriter fileWriter = new FileWriter(saveLocation);
+				BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+				bufferedWriter.write(this.htmlDocument.body().html());
+				bufferedWriter.close();
+			}
+			
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

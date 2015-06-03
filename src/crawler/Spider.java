@@ -12,6 +12,8 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+// TODO: href=mailto:@ must be excluded.
+// TODO: http://add.com and http://add.com/ must be considered as same page.
 /**
  * Spider crawl the given url address,
  * list its outgoing addresses.
@@ -79,7 +81,7 @@ public class Spider {
 	 */
 	public void saveHtml(String saveLocation) {
 		try {
-			if (this.htmlDocument != null) { 
+			if (this.htmlDocument != null && this.htmlDocument.body() != null) { 
 				FileWriter fileWriter = new FileWriter(saveLocation);
 				BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
 				bufferedWriter.write(this.htmlDocument.body().html());

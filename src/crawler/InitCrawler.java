@@ -11,7 +11,7 @@ public class InitCrawler {
 	public static final boolean DEBUGMODE = true;
 	
 	public static void main(String[] args) {
-		String seedUrl = "http://unix.stackexchange.com/";
+		String seedUrl = "http://www.metu.edu.tr";
 		int maxDepth = 2;
 		int maxPages = 500;
 		

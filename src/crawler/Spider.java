@@ -95,24 +95,6 @@ public class Spider {
 	}
 	
 	/**
-	 * Search for word in the body content of a given url.
-	 * @param word
-	 * @return true if found, false otherwise.
-	 */
-	public boolean searchWord(String word) {
-		if (this.htmlDocument == null)
-			return false;
-		
-		Element docBody = this.htmlDocument.body();
-		String bodyText;
-		if (docBody != null) {
-			bodyText = docBody.text();
-			return bodyText.toLowerCase().contains(word.toLowerCase());
-		} else
-			return false;
-	}
-	
-	/**
 	 * Getter for outgoing links.
 	 * @return
 	 */

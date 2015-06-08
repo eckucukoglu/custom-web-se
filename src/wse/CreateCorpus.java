@@ -21,7 +21,8 @@ public class CreateCorpus {
 		String usage = "java wse.CreateCorpus"
 			+ " [-url SEED_URL] [-depth MAX_DEPTH] [-pages MAX_PAGES]\n\n"
 			+ "This crawls the seed url until max depth or max pages number "
-			+ "reached. Then indexes the documents.";
+			+ "reached.\nThen indexes the documents. \nDefault values for "
+			+ "MAX_DEPTH = 2, MAX_PAGES = 500.";
 		
 		String seedUrl = null;
 		int maxDepth = 2;
@@ -51,7 +52,7 @@ public class CreateCorpus {
 		crawler.collect();
 		crawler.createLog();
 		
-		/** Index the extracted documents **/
+		/** Index the crawled documents. **/
 		Indexer indexer = new Indexer(collectionId);
 		indexer.index();
 	}

@@ -6,7 +6,8 @@ import searcher.SearchFiles;
  * For a given query string, search the
  * collection and print out at most K documents
  * results.
- *
+ * 
+ * ScoreDoc[] hits = searcher.getDocs().scoreDocs;
  */
 public class SearchQuery {
 
@@ -31,6 +32,8 @@ public class SearchQuery {
 			} else if ("-k".equals(args[i])) {
 				K = Integer.parseInt(args[i+1]);
 				i++;
+			} else {
+				queryString = queryString.concat(" " + args[i]);
 			}
 		}
 		

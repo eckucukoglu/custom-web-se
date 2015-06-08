@@ -67,6 +67,9 @@ public class SearchFiles {
 			return;
 		
 		Query query = parser.parse(queryStr);
+		
+		// if (Enums.DEBUGMODE) System.out.println("[I]Searching for: " + query.toString(Enums.FIELD_CONTENT));
+		
 		this.topDocs = searcher.search(query, K);
 		
 		reader.close();

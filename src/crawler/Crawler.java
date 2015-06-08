@@ -2,6 +2,7 @@ package crawler;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.nio.file.Path;
@@ -13,6 +14,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import utils.Enums;
 
 /**
  * Crawler takes depth, maxpage and url as an
@@ -24,26 +26,24 @@ import java.util.Set;
  */
 public class Crawler {
 	
-	public static final String DATADIR = "data/collections";
-	public static final String LOGFILE = "crawl.log";
-	
 	private Url initialUrl;
 	private int maxDepth;
 	private int maxPages;
 	private int collectionId = 0;
+
 	private int docId = 0;
 	
 	private Set<Url> pagesVisited = new HashSet<Url>();
 	private List<Url> pagesToVisit = new LinkedList<Url>();
 	
 	/**
-	 * Constructor.
+	 * Crawler constructor.
 	 * 
 	 * @param url
 	 * @param depth
 	 * @param pages
 	 */
-	Crawler (String url, int depth, int pages) {
+	public Crawler (String url, int depth, int pages) {
 		this.initialUrl = new Url(url, 0);
 		this.maxDepth = depth;
 		this.maxPages = pages;
@@ -56,6 +56,8 @@ public class Crawler {
 	 * 
 	 */
 	public void collect() {
+		String mapFilePath = createUrlMap();
+		
 		while (this.pagesVisited.size() < this.maxPages) {
 			Url currentUrl;
 			Spider spider = new Spider();
@@ -69,20 +71,43 @@ public class Crawler {
 			
 			// Maximum depth control
 			if (currentUrl.getDepth() > this.maxDepth) {
-				if (InitCrawler.DEBUGMODE) System.out.println("[I]Reached max-depth count.");
+				if (Enums.DEBUGMODE) System.out.println("[I]Reached max-depth count.");
 				return;
 			}
 			
 			spider.crawl(currentUrl);
+			spider.appendToMap(mapFilePath, this.docId, currentUrl);
 			spider.saveHtml(saveLocation());
 			this.pagesVisited.add(currentUrl);
 			
 			this.pagesToVisit.addAll(spider.getLinks());
 		}
 		
-		if (InitCrawler.DEBUGMODE) System.out.println("[I]Reached max-page count.");
+		if (Enums.DEBUGMODE) System.out.println("[I]Reached max-page count.");
 	}
 	
+	/**
+	 * Creates a map file which includes
+	 * document name - url maps per line.
+	 * 
+	 * @return path of the map file
+	 */
+	private String createUrlMap() {
+		Path path = Paths.get(System.getProperty("user.dir"), Enums.DATA_DIR, 
+				Enums.LOGS_DIR, Integer.toString(this.collectionId).concat(Enums.MAP_URL_FILE));
+		String pathStr = path.toString();
+		
+		File file = new File(pathStr);
+		
+		try {
+			file.createNewFile();
+		} catch (IOException ioe) {
+			if (Enums.DEBUGMODE) System.out.println("[E]Can't create file: " + pathStr);
+		}
+		
+		return pathStr;
+	}
+
 	/**
 	 * Create directory for content storage.
 	 * Assign numerical value to directories sequentially.
@@ -91,22 +116,16 @@ public class Crawler {
 	 */
 	private boolean createDirectory() {
 		while (true) {
-			Path path = Paths.get(System.getProperty("user.dir"), DATADIR, Integer.toString(collectionId));
-			String pathStr = path.toString();
-			File dir = new File(pathStr);
+			Path path = Paths.get(System.getProperty("user.dir"), Enums.DATA_DIR, 
+					Enums.COLLECTIONS_DIR, Integer.toString(collectionId));
 			
-			if (!dir.exists()) {
-				try {
-					dir.mkdir();
-					if (InitCrawler.DEBUGMODE) System.out.println("[I]Created directory: " + pathStr);
-					return true;
-				} catch (SecurityException se) {
-					return false;
-				}
-			} else {
+			if (!Enums.createDirectory(path)) {
 				(this.collectionId)++;
-			}
+			} else
+				break;
 		}
+		
+		return true;
 	}
 	
 	/**
@@ -116,7 +135,8 @@ public class Crawler {
 	 * @return true if successfull, false otherwise.
 	 */
 	public boolean createLog() {
-		Path path = Paths.get(System.getProperty("user.dir"), DATADIR, Integer.toString(collectionId), LOGFILE);
+		Path path = Paths.get(System.getProperty("user.dir"), Enums.DATA_DIR, 
+				Enums.LOGS_DIR, Integer.toString(this.collectionId).concat(Enums.LOG_FILE));
 		String pathStr = path.toString();
 		
 		try {
@@ -136,14 +156,14 @@ public class Crawler {
 			}
 			writer.close();
 			
-			if (InitCrawler.DEBUGMODE) System.out.println("[I]Created log: " + path.toString());
+			if (Enums.DEBUGMODE) System.out.println("[I]Created log: " + path.toString());
 			
 			return true;
 		} catch (FileNotFoundException e) {
-			if (InitCrawler.DEBUGMODE) System.out.println("[E]Collection directory does not exist. Log file couldn't generated.");
+			if (Enums.DEBUGMODE) System.out.println("[E]Collection directory does not exist. Log file couldn't generated.");
 			return false;
 		} catch (UnsupportedEncodingException e) {
-			if (InitCrawler.DEBUGMODE) System.out.println("[E]Unsupported encoding in log file.");
+			if (Enums.DEBUGMODE) System.out.println("[E]Unsupported encoding in log file.");
 			return false;
 		}
 	}
@@ -169,10 +189,20 @@ public class Crawler {
 	 * @return path string for next document storage.
 	 */
 	private String saveLocation () {
-		Path path = Paths.get(System.getProperty("user.dir"), DATADIR, Integer.toString(collectionId), Integer.toString(docId));
+		Path path = Paths.get(System.getProperty("user.dir"), Enums.DATA_DIR, 
+				Enums.COLLECTIONS_DIR, Integer.toString(collectionId), Integer.toString(docId));
 		String pathStr = path.toString();
 		(this.docId)++;
 		
 		return pathStr;
+	}
+	
+	/**
+	 * Getter for crawled collection id
+	 * 
+	 * @return collection id
+	 */
+	public int getCollectionId() {
+		return collectionId;
 	}
 }

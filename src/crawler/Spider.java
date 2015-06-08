@@ -3,6 +3,7 @@ package crawler;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -12,8 +13,12 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import utils.Enums;
+
 // TODO: href=mailto:@ must be excluded.
 // TODO: http://add.com and http://add.com/ must be considered as same page.
+// TODO: fix character encoding problem
+
 /**
  * Spider crawl the given url address,
  * list its outgoing addresses.
@@ -26,7 +31,6 @@ public class Spider {
 	"Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/535.1 (KHTML, like Gecko) Chrome/13.0.782.112 Safari/535.1";
 	private List<Url> links = new LinkedList<Url>();
 	private Document htmlDocument;
-	//private Document myDoc;
 	
 	/**
 	 * This method gets html content of a given url,
@@ -41,19 +45,16 @@ public class Spider {
 			Document htmlDocument = connection.get();
 			this.htmlDocument = htmlDocument;
 			
-			// TODO: fix character encoding problem
-			//this.myDoc = Jsoup.parse(new URL(url.getUrl()).openStream(), "ISO-8859-9", url.getUrl());
-			
 			// Check HTTP OK status code (200).
 			if (connection.response().statusCode() == 200) {
-				if (InitCrawler.DEBUGMODE) System.out.println("[I]Received web page\t" + url.getUrl() + "\t" + url.getDepth());
+				if (Enums.DEBUGMODE) System.out.println("[I]Received web page\t" + url.getUrl() + "\t" + url.getDepth());
 			} else {
 				// TODO: Exception in thread "main" java.lang.NullPointerException
-				if (InitCrawler.DEBUGMODE) System.out.println("[E]HTTP status code: " + connection.response().statusCode());
+				if (Enums.DEBUGMODE) System.out.println("[E]HTTP status code: " + connection.response().statusCode());
 			}
 			
 			if (!connection.response().contentType().contains("text/html")) {
-				if (InitCrawler.DEBUGMODE) System.out.println("[E]Retrieved something other than HTML");
+				if (Enums.DEBUGMODE) System.out.println("[E]Retrieved something other than HTML");
 				return false;
 			}
 			
@@ -84,7 +85,7 @@ public class Spider {
 			if (this.htmlDocument != null && this.htmlDocument.body() != null) { 
 				FileWriter fileWriter = new FileWriter(saveLocation);
 				BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
-				bufferedWriter.write(this.htmlDocument.body().html());
+				bufferedWriter.write(this.htmlDocument.text());
 				bufferedWriter.close();
 			}
 			
@@ -117,5 +118,23 @@ public class Spider {
 	 */
 	public List<Url> getLinks() {
 		return this.links;
+	}
+
+	/**
+	 * Append the map file a 
+	 * document name - url pairs.
+	 * 
+	 * @param mapFilePath map file path
+	 * @param docId document name or id
+	 * @param currentUrl url
+	 */
+	public void appendToMap(String mapFilePath, int docId, Url currentUrl) {
+		
+		try (PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(mapFilePath, true)))) {
+		    out.println(docId + "\t" + currentUrl.getUrl());
+		} catch (IOException e) {
+			if (Enums.DEBUGMODE) System.out.println("[E]Can't append to " + mapFilePath);
+		}
+		
 	}
 }

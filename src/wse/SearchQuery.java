@@ -17,8 +17,8 @@ public class SearchQuery {
 				+ "and print out top-k documents.\nDefault values for "
 				+ "K = 10.";
 			
-		String queryString = "francis";
-		int collectionId = 0;
+		String queryString = null;
+		int collectionId = -1;
 		int K = 10;
 		
 		for (int i=0; i < args.length; i++) {

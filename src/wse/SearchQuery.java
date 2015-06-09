@@ -125,8 +125,6 @@ public class SearchQuery {
 			resultDocsArray[i] = resultDocs.get(i);
 		}
 		
-		// TODO: fix bug in the sorting algorithm: sort descending order for score.
-		
 		sorter.sort(resultDocsArray, false);
 		
 		return (new TopDocs(K, resultDocsArray, 0));

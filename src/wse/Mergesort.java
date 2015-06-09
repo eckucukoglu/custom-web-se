@@ -52,7 +52,7 @@ public class Mergesort {
 					j++;
 				}
 			} else {
-				if (helper[i].score <= helper[j].score) {
+				if (helper[i].score >= helper[j].score) {
 					scoredocs[k].doc = helper[i].doc;
 					scoredocs[k].score = helper[i].score;
 					i++;

@@ -39,9 +39,13 @@ public class Enums {
 		
 		if (!dir.exists()) {
 			try {
-				dir.mkdir();
-				if (Enums.DEBUGMODE) System.out.println("[I]Created directory: " + pathStr);
-				return true;
+				if (dir.mkdir()) {
+					if (Enums.DEBUGMODE) System.out.println("[I]Created directory: " + pathStr);
+					return true;
+				} else {
+					if (Enums.DEBUGMODE) System.out.println("[E]Directory could not create: " + pathStr);
+					return false;
+				}
 			} catch (SecurityException se) {
 				return false;
 			}

@@ -47,7 +47,7 @@ public class Crawler {
 		this.initialUrl = new Url(url, 0);
 		this.maxDepth = depth;
 		this.maxPages = pages;
-		createDirectory();
+		createDirectories();
 	}
 	
 	/**
@@ -109,12 +109,12 @@ public class Crawler {
 	}
 
 	/**
-	 * Create directory for content storage.
+	 * Creates collection directory for content storage.
 	 * Assign numerical value to directories sequentially.
 	 * 
 	 * @return
 	 */
-	private boolean createDirectory() {
+	private boolean createCollectionDirectory() {
 		while (true) {
 			Path path = Paths.get(System.getProperty("user.dir"), Enums.DATA_DIR, 
 					Enums.COLLECTIONS_DIR, Integer.toString(collectionId));
@@ -126,6 +126,22 @@ public class Crawler {
 		}
 		
 		return true;
+	}
+	
+	private void createDirectories() {
+		Path data_path = Paths.get(System.getProperty("user.dir"), Enums.DATA_DIR);
+		Path collections_path = Paths.get(System.getProperty("user.dir"), Enums.DATA_DIR, 
+				Enums.COLLECTIONS_DIR);
+		Path indexes_path = Paths.get(System.getProperty("user.dir"), Enums.DATA_DIR, 
+				Enums.INDEXES_DIR);
+		Path logs_path = Paths.get(System.getProperty("user.dir"), Enums.DATA_DIR, 
+				Enums.LOGS_DIR);
+		
+		if (Enums.createDirectory(data_path) && Enums.createDirectory(collections_path)) {
+			Enums.createDirectory(indexes_path);
+			Enums.createDirectory(logs_path);
+			createCollectionDirectory();
+		}
 	}
 	
 	/**
